@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  serviceName: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: redis
+        image: 775698064297.dkr.ecr.eu-west-3.amazonaws.com/abdelhak/redis:8.2.4-alpine3.22
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: volume
+          mountPath: /data
+      imagePullSecrets: 
+      - name: ecr-helper
+  volumeClaimTemplates:
+  - metadata:
+      name: volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 1Gi
